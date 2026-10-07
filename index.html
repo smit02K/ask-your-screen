@@ -8,7 +8,16 @@
 <meta property="og:description" content="Record your screen, ask it anything later. Screenpipe vs LUCI vs Microsoft Recall, all local, no uploads.">
 <meta property="og:url" content="https://smit02k.github.io/ask-your-screen/">
 <meta property="og:image" content="https://smit02k.github.io/ask-your-screen/assets/preview.png">
-<meta name="twitter:card" content="summary_large_image"><link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="twitter:card" content="summary_large_image">
+<script>
+/* Theme: dark by default; remembers the visitor's choice. Runs before content renders to avoid a flash. */
+(function(){
+  var t = 'dark';
+  try { var s = localStorage.getItem('theme'); if (s === 'light' || s === 'dark') t = s; } catch(e){}
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
 <style>
@@ -59,6 +68,14 @@ section{padding-block:56px 0; display:grid; gap:24px}
 .recdot{width:12px; height:12px; border-radius:50%; background:var(--rec); box-shadow:0 0 0 4px color-mix(in srgb,var(--rec) 22%,transparent); animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--rec) 0%,transparent)}}
 .meta{font-family:var(--f-mono); font-size:12px; color:var(--muted)}
+.top-right{display:flex; align-items:center; gap:14px}
+.theme-btn{font:inherit; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:8px; padding:7px 12px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; transition:border-color .2s, background .2s}
+.theme-btn:hover{border-color:var(--muted)}
+.theme-btn svg{flex:none}
+.theme-btn .i-sun{display:none}
+:root[data-theme="dark"] .theme-btn .i-sun{display:block}
+:root[data-theme="dark"] .theme-btn .i-moon{display:none}
+body{transition:background-color .25s, color .25s}
 
 /* hero */
 .hero{display:grid; grid-template-columns:1.05fr 1fr; gap:40px; align-items:center; padding-block:24px 8px}
@@ -216,7 +233,14 @@ footer{margin-top:40px; font-family:var(--f-mono); font-size:12px; color:var(--m
 <div class="wrap">
   <header class="top">
     <div class="brand"><span class="recdot" aria-hidden="true"></span>Ask Your Screen</div>
-    <div class="meta">Tool research · 30 Sep 2026</div>
+    <div class="top-right">
+      <div class="meta">Tool research · 30 Sep 2026</div>
+      <button class="theme-btn" id="theme-btn" type="button" aria-label="Switch color theme">
+        <svg class="i-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="i-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        <span class="theme-label">Light</span>
+      </button>
+    </div>
   </header>
 
   <!-- HERO -->
@@ -598,6 +622,21 @@ footer{margin-top:40px; font-family:var(--f-mono); font-size:12px; color:var(--m
 
 <script>
 (function(){
+  var root = document.documentElement, tbtn = document.getElementById('theme-btn');
+  function syncTheme(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    tbtn.querySelector('.theme-label').textContent = dark ? 'Light' : 'Dark';
+    tbtn.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#0E1016' : '#F5F6FA');
+  }
+  tbtn.addEventListener('click', function(){
+    var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch(e){}
+    syncTheme();
+  });
+  syncTheme();
+
   var tabs = document.querySelectorAll('.tab');
   function show(t){
     tabs.forEach(function(b){
