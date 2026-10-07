@@ -1,0 +1,621 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ask Your Screen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: a "screen" hero with a recording timeline, then a tool-colored comparison, setup tabs and a pilot plan. Each tool keeps one color everywhere. */
+:root{
+  --bg:#F5F6FA; --surface:#FFFFFF; --surface-2:#EEF0F6; --ink:#151823; --muted:#5B6072; --line:#DDE0EA;
+  --sp:#0B9A87; --sp-soft:#DDF5F0;
+  --lu:#D6336C; --lu-soft:#FCE3EC;
+  --rc:#2A62F0; --rc-soft:#E1E9FF;
+  --rec:#F0362B; --sun:#F5B400; --sun-soft:#FFF4D1;
+  --good:#12805C; --warn:#B26A00; --bad:#C0342B;
+  --screen:#12141C; --screen-ink:#E9ECF5; --screen-muted:#8B91A6;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Figtree", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1016; --surface:#171A23; --surface-2:#1F2330; --ink:#ECEEF5; --muted:#A2A8BB; --line:#2B3040;
+  --sp:#2FD3BA; --sp-soft:#113A34; --lu:#FF6D9C; --lu-soft:#3D1627; --rc:#6E97FF; --rc-soft:#172448;
+  --rec:#FF5A4F; --sun:#FFCB3D; --sun-soft:#3A2F0C; --good:#3FD39B; --warn:#FFB547; --bad:#FF7A70;
+  --screen:#07080C; --screen-ink:#E9ECF5; --screen-muted:#8B91A6; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0E1016; --surface:#171A23; --surface-2:#1F2330; --ink:#ECEEF5; --muted:#A2A8BB; --line:#2B3040;
+  --sp:#2FD3BA; --sp-soft:#113A34; --lu:#FF6D9C; --lu-soft:#3D1627; --rc:#6E97FF; --rc-soft:#172448;
+  --rec:#FF5A4F; --sun:#FFCB3D; --sun-soft:#3A2F0C; --good:#3FD39B; --warn:#FFB547; --bad:#FF7A70;
+  --screen:#07080C; --screen-ink:#E9ECF5; --screen-muted:#8B91A6; color-scheme:dark; }
+
+*{box-sizing:border-box}
+body{background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:16px; line-height:1.55}
+.wrap{max-width:1120px; margin:0 auto; padding-inline:20px; padding-block:0 64px}
+h1,h2,h3{font-family:var(--f-display); line-height:1.1; text-wrap:balance; margin:0}
+h2{font-size:clamp(28px,4vw,40px); font-weight:800; letter-spacing:-.02em}
+h3{font-size:20px; font-weight:700}
+p{margin:0}
+a{color:inherit}
+a.il{text-decoration:underline; text-decoration-thickness:1.5px; text-underline-offset:3px; text-decoration-color:color-mix(in srgb,currentColor 45%,transparent)}
+a.il:hover{text-decoration-color:currentColor}
+.pill{text-decoration:none}
+.tool h3 a.il{text-decoration-thickness:2px}
+.eyebrow{font-family:var(--f-mono); font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+section{padding-block:56px 0; display:grid; gap:24px}
+.lead{color:var(--muted); max-width:64ch; font-size:17px}
+:focus-visible{outline:3px solid var(--sun); outline-offset:2px; border-radius:6px}
+
+/* top bar */
+.top{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding-block:20px}
+.brand{display:flex; align-items:center; gap:10px; font-family:var(--f-display); font-weight:800; font-size:18px}
+.recdot{width:12px; height:12px; border-radius:50%; background:var(--rec); box-shadow:0 0 0 4px color-mix(in srgb,var(--rec) 22%,transparent); animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px color-mix(in srgb,var(--rec) 0%,transparent)}}
+.meta{font-family:var(--f-mono); font-size:12px; color:var(--muted)}
+
+/* hero */
+.hero{display:grid; grid-template-columns:1.05fr 1fr; gap:40px; align-items:center; padding-block:24px 8px}
+.hero > *{min-width:0}
+.hero h1{font-size:clamp(40px,6.4vw,76px); font-weight:800; letter-spacing:-.035em}
+.hero h1 em{font-style:normal; background:linear-gradient(90deg,var(--sp),var(--rc) 55%,var(--lu)); -webkit-background-clip:text; background-clip:text; color:transparent}
+.hero .lead{margin-top:18px}
+.pills{display:flex; flex-wrap:wrap; gap:10px; margin-top:24px}
+.pill{display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; font-weight:600; font-size:14px; border:1.5px solid currentColor}
+.pill i{width:8px; height:8px; border-radius:50%; background:currentColor}
+.c-sp{color:var(--sp)} .c-lu{color:var(--lu)} .c-rc{color:var(--rc)}
+.nolink{margin-top:22px; display:inline-flex; gap:10px; align-items:center; background:var(--sun-soft); color:var(--ink); padding:10px 14px; border-radius:10px; font-weight:600; font-size:14px}
+
+/* screen mock */
+.screen{background:var(--screen); color:var(--screen-ink); border-radius:18px; padding:16px; box-shadow:0 30px 60px -30px rgba(10,14,30,.55); display:grid; gap:14px}
+.screen-bar{display:flex; justify-content:space-between; align-items:center; font-family:var(--f-mono); font-size:12px; color:var(--screen-muted)}
+.lights{display:flex; gap:6px}.lights span{width:10px;height:10px;border-radius:50%;background:#3A3F50}
+.rec{display:inline-flex; align-items:center; gap:8px; color:#FF6B61; font-weight:600}
+.rec .recdot{width:9px;height:9px}
+.timeline{display:grid; gap:6px}
+.track{display:flex; height:30px; border-radius:8px; overflow:hidden; gap:2px}
+.track span{display:block}
+.ticks{display:flex; justify-content:space-between; font-family:var(--f-mono); font-size:11px; color:var(--screen-muted)}
+.chat{display:grid; gap:10px}
+.bubble{padding:12px 14px; border-radius:14px; font-size:14px; max-width:92%}
+.q{background:#2A2F3E; justify-self:end; border-bottom-right-radius:4px}
+.a{background:#16362F; border:1px solid #1F5A4F; border-bottom-left-radius:4px}
+.a b{color:#5EE6CF}
+.a code{font-family:var(--f-mono); font-size:12px; background:#0C1F1B; padding:2px 6px; border-radius:5px}
+.cite{display:inline-block; margin-top:6px; font-family:var(--f-mono); font-size:11px; color:#8FE9D8}
+.local{font-family:var(--f-mono); font-size:11px; color:var(--screen-muted); display:flex; gap:8px; align-items:center}
+.local b{color:#5EE6CF; font-weight:600}
+
+/* flow */
+.flow{display:grid; grid-template-columns:repeat(3,1fr); gap:16px; counter-reset:step}
+.step{background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:22px; display:grid; gap:10px; position:relative}
+.step .num{font-family:var(--f-mono); font-weight:600; font-size:13px; color:var(--muted)}
+.step h3{font-size:22px}
+.step p{color:var(--muted)}
+.step .icon{width:44px; height:44px; border-radius:12px; display:grid; place-items:center}
+.step:nth-child(1) .icon{background:var(--sp-soft); color:var(--sp)}
+.step:nth-child(2) .icon{background:var(--rc-soft); color:var(--rc)}
+.step:nth-child(3) .icon{background:var(--lu-soft); color:var(--lu)}
+
+/* tool cards */
+.tools{display:grid; grid-template-columns:repeat(3,1fr); gap:16px}
+.tool{border-radius:18px; padding:24px; display:grid; gap:14px; align-content:start; background:var(--surface); border:1px solid var(--line); border-top:6px solid var(--tc)}
+.tool[data-t="sp"]{--tc:var(--sp); --ts:var(--sp-soft)}
+.tool[data-t="lu"]{--tc:var(--lu); --ts:var(--lu-soft)}
+.tool[data-t="rc"]{--tc:var(--rc); --ts:var(--rc-soft)}
+.tool-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px}
+.tool h3{font-size:26px; font-weight:800; color:var(--tc)}
+.badge{font-family:var(--f-mono); font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; padding:5px 9px; border-radius:6px; background:var(--ts); color:var(--tc); white-space:nowrap}
+.badge.best{background:var(--sun); color:#1A1400}
+.tool .tag{font-weight:600}
+.tool ul{margin:0; padding:0; list-style:none; display:grid; gap:8px}
+.tool li{display:grid; grid-template-columns:20px 1fr; gap:8px; font-size:15px}
+.tool li svg{margin-top:3px}
+.yes{color:var(--good)} .no{color:var(--bad)} .mid{color:var(--warn)}
+.price{font-family:var(--f-mono); font-size:13px; color:var(--muted); border-top:1px dashed var(--line); padding-top:12px}
+
+/* table */
+.tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:16px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:760px; font-size:15px}
+th,td{padding:14px 16px; text-align:left; vertical-align:top; border-bottom:1px solid var(--line)}
+thead th{font-family:var(--f-display); font-size:18px; font-weight:800; position:sticky; top:0; background:var(--surface)}
+thead th.sp{color:var(--sp); box-shadow:inset 0 -4px 0 var(--sp)} thead th.lu{color:var(--lu); box-shadow:inset 0 -4px 0 var(--lu)} thead th.rc{color:var(--rc); box-shadow:inset 0 -4px 0 var(--rc)}
+tbody th{font-weight:600; color:var(--muted); width:22%; font-size:14px}
+tbody tr:last-child > *{border-bottom:0}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--surface-2) 55%,transparent)}
+.mark{display:inline-flex; align-items:center; gap:6px; font-weight:600}
+.mark::before{content:""; width:9px; height:9px; border-radius:50%; background:currentColor; flex:none}
+td small{display:block; color:var(--muted); font-size:13px; margin-top:2px}
+
+/* tabs */
+.tabs{display:flex; gap:8px; flex-wrap:wrap}
+.tab{font:inherit; font-weight:700; font-size:15px; padding:10px 18px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer; display:inline-flex; gap:8px; align-items:center}
+.tab i{width:9px;height:9px;border-radius:50%;background:var(--tc)}
+.tab[data-t="sp"]{--tc:var(--sp); --ts:var(--sp-soft)} .tab[data-t="lu"]{--tc:var(--lu); --ts:var(--lu-soft)} .tab[data-t="rc"]{--tc:var(--rc); --ts:var(--rc-soft)}
+.tab[aria-selected="true"]{background:var(--ts); border-color:var(--tc); color:var(--tc)}
+.panel{--tc:var(--sp); --ts:var(--sp-soft); display:grid; grid-template-columns:1fr 1.3fr; gap:20px; background:var(--surface); border:1px solid var(--line); border-radius:18px; padding:24px; border-left:6px solid var(--tc)}
+.panel[data-t="lu"]{--tc:var(--lu); --ts:var(--lu-soft)} .panel[data-t="rc"]{--tc:var(--rc); --ts:var(--rc-soft)}
+.panel > *{min-width:0}
+.panel h3{color:var(--tc); margin-bottom:12px}
+.req{list-style:none; margin:0; padding:0; display:grid; gap:10px}
+.req li{display:grid; grid-template-columns:22px 1fr; gap:8px}
+.req .box{width:18px; height:18px; border-radius:5px; border:2px solid var(--tc); margin-top:3px}
+.req b{font-weight:700}
+.steps{margin:0; padding:0; list-style:none; counter-reset:s; display:grid; gap:12px}
+.steps li{counter-increment:s; display:grid; grid-template-columns:32px 1fr; gap:10px; align-items:start}
+.steps li::before{content:counter(s); width:28px; height:28px; border-radius:50%; background:var(--tc); color:var(--surface); font-family:var(--f-mono); font-weight:600; font-size:13px; display:grid; place-items:center}
+.cmd{display:flex; align-items:center; gap:8px; margin-top:6px; background:var(--surface-2); border-radius:8px; padding:6px 6px 6px 12px; font-family:var(--f-mono); font-size:13px; overflow-x:auto}
+.cmd code{flex:1; white-space:nowrap}
+.copy{font:inherit; font-family:var(--f-body); font-size:12px; font-weight:700; border:0; border-radius:6px; padding:6px 10px; background:var(--tc); color:var(--surface); cursor:pointer}
+.kbd{font-family:var(--f-mono); font-size:12.5px; background:var(--surface-2); border:1px solid var(--line); border-bottom-width:2px; padding:1px 6px; border-radius:5px}
+.links{display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; grid-column:1/-1}
+.links a{text-decoration:none; font-weight:600; font-size:14px; padding:8px 12px; border-radius:8px; background:var(--ts); color:var(--tc); display:inline-flex; gap:6px; align-items:center}
+.links a:hover{text-decoration:underline}
+.note{grid-column:1/-1; font-size:14px; color:var(--muted); background:var(--surface-2); padding:10px 14px; border-radius:10px}
+
+/* questions */
+.qs{display:flex; flex-wrap:wrap; gap:10px}
+.qs span{padding:10px 16px; border-radius:14px; border-bottom-left-radius:4px; font-weight:500; background:var(--surface); border:1px solid var(--line)}
+.qs span:nth-child(3n+1){border-color:var(--sp)} .qs span:nth-child(3n+2){border-color:var(--rc)} .qs span:nth-child(3n){border-color:var(--lu)}
+
+/* ruled out */
+.out{display:grid; grid-template-columns:repeat(4,1fr); gap:12px}
+.out div{background:var(--surface); border:1px dashed var(--line); border-radius:14px; padding:16px; display:grid; gap:6px; align-content:start}
+.out b{font-family:var(--f-display); font-size:18px}
+.out span{font-size:14px; color:var(--muted)}
+.out em{font-style:normal; font-family:var(--f-mono); font-size:11px; font-weight:600; color:var(--bad); text-transform:uppercase; letter-spacing:.08em}
+
+/* verdict */
+.verdict{background:var(--screen); color:var(--screen-ink); border-radius:22px; padding:32px; display:grid; grid-template-columns:1fr 1fr; gap:32px}
+.verdict > *{min-width:0}
+.verdict h2{color:var(--screen-ink)}
+.verdict h2 span{color:#5EE6CF}
+.verdict p{color:#B7BDD0; margin-top:14px}
+.plan{list-style:none; margin:0; padding:0; display:grid; gap:12px}
+.plan li{display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start; background:#1B1F2B; border-radius:12px; padding:14px}
+.plan .d{font-family:var(--f-mono); font-size:12px; font-weight:600; color:#1A1400; background:#FFCB3D; padding:4px 8px; border-radius:6px; white-space:nowrap}
+
+.sources{font-size:14px; color:var(--muted); display:grid; gap:6px; columns:2; column-gap:32px}
+.sources a{display:block; break-inside:avoid; padding-block:3px}
+footer{margin-top:40px; font-family:var(--f-mono); font-size:12px; color:var(--muted)}
+
+
+/* FAQ */
+.faq-nav{display:flex; flex-wrap:wrap; gap:8px}
+.faq-nav a{text-decoration:none; font-weight:600; font-size:14px; padding:7px 12px; border-radius:999px; background:var(--surface-2); color:var(--ink)}
+.faq-group{display:grid; gap:12px}
+.faq-group h3{display:flex; align-items:center; gap:10px; font-size:22px}
+.faq-group h3 i{width:12px; height:12px; border-radius:4px; background:var(--gc)}
+.faq-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+.qa{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:18px; display:grid; gap:8px; align-content:start}
+.qa > *{min-width:0}
+.qa .qq{font-family:var(--f-display); font-weight:700; font-size:17px; line-height:1.3; display:grid; grid-template-columns:auto 1fr; gap:10px}
+.qa .qq::before{content:"Q"; font-family:var(--f-mono); font-size:12px; font-weight:600; width:24px; height:24px; border-radius:6px; display:grid; place-items:center; background:var(--gc); color:var(--surface)}
+.qa .aa{color:var(--muted); font-size:15px}
+.qa .aa b{color:var(--ink)}
+.qa .src{font-size:13px}
+.flag{display:inline-block; font-family:var(--f-mono); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; padding:3px 7px; border-radius:5px; background:var(--sun-soft); color:var(--warn)}
+@media (max-width:860px){ .faq-grid{grid-template-columns:1fr} }
+
+@media (max-width:860px){
+  .hero,.panel,.verdict{grid-template-columns:1fr}
+  .flow,.tools{grid-template-columns:1fr}
+  .out{grid-template-columns:1fr 1fr}
+  .sources{columns:1}
+}
+@media (max-width:480px){ .out{grid-template-columns:1fr} .verdict{padding:22px} }
+@media (prefers-reduced-motion:reduce){ .recdot{animation:none} }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><span class="recdot" aria-hidden="true"></span>Ask Your Screen</div>
+    <div class="meta">Tool research · 30 Sep 2026</div>
+  </header>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div>
+      <div class="eyebrow">Record now, ask later</div>
+      <h1>Record your screen. <em>Ask it anything</em> later.</h1>
+      <p class="lead">We compared three tools that record what happens on your computer and let you search it or ask questions about it afterwards. All three keep the recordings on your own computer.</p>
+      <div class="pills">
+        <a class="pill c-sp" href="https://screenpipe.com/" target="_blank" rel="noopener"><i></i>Screenpipe ↗</a>
+        <a class="pill c-lu" href="https://luci.memories.ai/" target="_blank" rel="noopener"><i></i>LUCI ↗</a>
+        <a class="pill c-rc" href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener"><i></i>Microsoft Recall ↗</a>
+      </div>
+      <div class="nolink">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        No video uploads. The recordings never leave your computer.
+      </div>
+    </div>
+
+    <div class="screen" aria-label="Example: asking Screenpipe about a recorded day">
+      <div class="screen-bar">
+        <div class="lights" aria-hidden="true"><span></span><span></span><span></span></div>
+        <span>Example</span><span class="rec"><span class="recdot"></span>REC 06:42:18</span>
+      </div>
+      <div class="timeline">
+        <div class="track" aria-hidden="true">
+          <span style="flex:14;background:#2FD3BA"></span>
+          <span style="flex:9;background:#6E97FF"></span>
+          <span style="flex:5;background:#3A3F50"></span>
+          <span style="flex:12;background:#FF6D9C"></span>
+          <span style="flex:7;background:#2FD3BA"></span>
+          <span style="flex:10;background:#FFCB3D"></span>
+          <span style="flex:4;background:#3A3F50"></span>
+          <span style="flex:11;background:#6E97FF"></span>
+        </div>
+        <div class="ticks"><span>09:00</span><span>11:00</span><span>13:00</span><span>15:00</span></div>
+      </div>
+      <div class="chat">
+        <div class="bubble q">What was the link Priya shared in the 10am call?</div>
+        <div class="bubble a">It was the <b>Q4 outreach sheet</b>. You opened <code>docs.google.com/…/outreach-q4</code> right after the call.<br><span class="cite">▶ 10:17 · Google Meet · Chrome</span></div>
+      </div>
+      <div class="local"><span>Answered by</span><b>llama3.2 on this computer</b><span>· 0 bytes uploaded</span></div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section aria-labelledby="how">
+    <div>
+      <div class="eyebrow">How it works</div>
+      <h2 id="how">Three steps, all on your computer</h2>
+    </div>
+    <div class="flow">
+      <div class="step">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><circle cx="12" cy="10.5" r="2.5" fill="currentColor"/><path d="M8 21h8"/></svg></div>
+        <div class="num">Step 1</div>
+        <h3>Record</h3>
+        <p>The app quietly captures your screen, and your microphone and system audio if you allow it, while you work.</p>
+      </div>
+      <div class="step">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h13"/></svg></div>
+        <div class="num">Step 2</div>
+        <h3>Index</h3>
+        <p>It reads the text on screen and transcribes speech, then saves everything to a local database you can search.</p>
+      </div>
+      <div class="step">
+        <div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></div>
+        <div class="num">Step 3</div>
+        <h3>Ask</h3>
+        <p>Type a question in plain English. A local AI model finds the right moment and answers.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOL CARDS -->
+  <section aria-labelledby="glance">
+    <div>
+      <div class="eyebrow">At a glance</div>
+      <h2 id="glance">The three options</h2>
+    </div>
+    <div class="tools">
+      <article class="tool" data-t="sp">
+        <div class="tool-head"><h3><a class="il" href="https://screenpipe.com/" target="_blank" rel="noopener">Screenpipe</a></h3><span class="badge best">Our pick</span></div>
+        <p class="tag">Records all day and answers questions with a local AI model</p>
+        <ul>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Ask questions in plain English</span></li>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Works offline with <a class="il" href="https://ollama.com/" target="_blank" rel="noopener">Ollama</a>, no API key</span></li>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Mac, Windows and Linux</span></li>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Claude and other agents can query it (API + <a class="il" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP</a>)</span></li>
+          <li><svg class="mid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M12 7v6M12 17h.01"/></svg><span>Uses about 30 GB of disk a month</span></li>
+        </ul>
+        <div class="price">Free $0 · Basic $21/mo · Business $42/seat/mo · <a class="il" href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">pricing</a></div>
+      </article>
+      <article class="tool" data-t="lu">
+        <div class="tool-head"><h3><a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">LUCI</a></h3><span class="badge">Runner-up</span></div>
+        <p class="tag">Recording sessions with answers that link back to the exact moment</p>
+        <ul>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Ask questions and get answers with citations</span></li>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Runs on-device and encrypts data at rest</span></li>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Claude, Cursor and Codex can connect via MCP</span></li>
+          <li><svg class="mid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M12 7v6M12 17h.01"/></svg><span>Free sessions are capped at 4 hours</span></li>
+          <li><svg class="no" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>No Linux version, and it's closed source</span></li>
+        </ul>
+        <div class="price">Free (4-hour sessions) · <a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">luci.memories.ai</a></div>
+      </article>
+      <article class="tool" data-t="rc">
+        <div class="tool-head"><h3><a class="il" href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Microsoft Recall</a></h3><span class="badge">Search only</span></div>
+        <p class="tag">Built into Windows 11 on Copilot+ PCs</p>
+        <ul>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Free and built into Windows</span></li>
+          <li><svg class="yes" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg><span>Windows Hello locks your snapshots</span></li>
+          <li><svg class="no" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Search only, no question answering</span></li>
+          <li><svg class="no" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>Needs a <a class="il" href="https://www.microsoft.com/en-us/windows/copilot-plus-pcs" target="_blank" rel="noopener">Copilot+ PC</a> (40 TOPS NPU, 16 GB RAM)</span></li>
+          <li><svg class="no" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span>No API for agents</span></li>
+        </ul>
+        <div class="price">Free · included with Windows 11 · <a class="il" href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Microsoft guide</a></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- COMPARISON -->
+  <section aria-labelledby="diff">
+    <div>
+      <div class="eyebrow">Side by side</div>
+      <h2 id="diff">What's different</h2>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th scope="col"><span class="eyebrow">Feature</span></th><th class="sp" scope="col">Screenpipe</th><th class="lu" scope="col">LUCI</th><th class="rc" scope="col">Microsoft Recall</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Uploads the recording?</th><td><span class="mark yes">No</span><small>Local by default</small></td><td><span class="mark yes">No</span><small>On-device, encrypted</small></td><td><span class="mark yes">No</span><small>Local snapshots</small></td></tr>
+          <tr><th scope="row">Ask questions in plain English</th><td><span class="mark yes">Yes</span><small>Chat through a local model (Ollama)</small></td><td><span class="mark yes">Yes</span><small>Answers cite the exact moment</small></td><td><span class="mark no">No</span><small>Search plus Click to Do</small></td></tr>
+          <tr><th scope="row">What it records</th><td>Screen and audio, all day</td><td>Screen and audio, in sessions</td><td>Screen snapshots, all day</td></tr>
+          <tr><th scope="row">Platforms</th><td>Mac, Windows 10/11, Linux</td><td>Mac, Windows</td><td>Windows 11, Copilot+ PCs only</td></tr>
+          <tr><th scope="row">Minimum hardware</th><td>4 GB+ RAM recommended<small>Plus about 4 GB free for the local AI model</small></td><td>Not published</td><td>16 GB RAM, 40 TOPS NPU, 256 GB SSD</td></tr>
+          <tr><th scope="row">Disk space</th><td>About 30 GB a month</td><td>Not published</td><td>50 GB free to turn it on</td></tr>
+          <tr><th scope="row">Works with Claude / agents</th><td><span class="mark yes">Yes</span><small>REST API + MCP server</small></td><td><span class="mark yes">Yes</span><small>MCP Agent Bridge</small></td><td><span class="mark no">No</span></td></tr>
+          <tr><th scope="row">Source code</th><td>Source-available</td><td>Closed</td><td>Closed</td></tr>
+          <tr><th scope="row">Price</th><td>Free $0 (1 device, limited history)<small>Basic $21/mo · Business $42/seat/mo · <a class="il" href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">see pricing</a></small></td><td>Free (4-hour sessions)</td><td>Free</td></tr>
+          <tr><th scope="row">Best for</th><td><b>A team pilot</b></td><td>Short sessions where you want answers with citations</td><td>People who already own a Copilot+ PC</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <section aria-labelledby="setup">
+    <div>
+      <div class="eyebrow">Setup guide</div>
+      <h2 id="setup">Prerequisites and how to use each one</h2>
+    </div>
+    <div class="tabs" role="tablist" aria-label="Choose a tool">
+      <button class="tab" role="tab" id="tab-sp" data-t="sp" aria-selected="true" aria-controls="p-sp"><i></i>Screenpipe</button>
+      <button class="tab" role="tab" id="tab-lu" data-t="lu" aria-selected="false" aria-controls="p-lu"><i></i>LUCI</button>
+      <button class="tab" role="tab" id="tab-rc" data-t="rc" aria-selected="false" aria-controls="p-rc"><i></i>Microsoft Recall</button>
+    </div>
+
+    <div class="panel" id="p-sp" data-t="sp" role="tabpanel" aria-labelledby="tab-sp">
+      <div>
+        <h3>Before you start</h3>
+        <ul class="req">
+          <li><span class="box"></span><span><b>Computer:</b> Mac (Apple Silicon or Intel), Windows 10/11, or Linux</span></li>
+          <li><span class="box"></span><span><b>Hardware:</b> quad-core CPU, 4 GB+ RAM, SSD recommended. The minimum is dual-core with 2 GB.</span></li>
+          <li><span class="box"></span><span><b>Disk:</b> about 30 GB a month at the default 1 frame per second</span></li>
+          <li><span class="box"></span><span><b>Local AI:</b> <a class="il" href="https://ollama.com/" target="_blank" rel="noopener">Ollama</a> plus a small model, such as <a class="il" href="https://ollama.com/library/llama3.2" target="_blank" rel="noopener">Llama 3.2</a> (about 2 GB). You need free RAM equal to the model size plus about 2 GB.</span></li>
+          <li><span class="box"></span><span><b>Permissions:</b> screen recording, microphone (for audio) and accessibility</span></li>
+          <li><span class="box"></span><span><b>Windows only:</b> <a class="il" href="https://developer.microsoft.com/en-us/microsoft-edge/webview2/" target="_blank" rel="noopener">Microsoft Edge WebView2 Runtime</a>, if the timeline shows blank</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>How to use it</h3>
+        <ol class="steps">
+          <li><span>Download and install Screenpipe from its <a class="il" href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">download page</a>. On a Mac, if Gatekeeper blocks it, right-click the app and choose <b>Open</b>.</span></li>
+          <li><span>Allow screen recording, microphone and accessibility access when asked.</span></li>
+          <li><span>Install <a class="il" href="https://ollama.com/" target="_blank" rel="noopener">Ollama</a>, then download a model:
+            <span class="cmd"><code>ollama run llama3.2</code><button class="copy" data-copy="ollama run llama3.2">Copy</button></span></span></li>
+          <li><span>In Screenpipe, click the <b>AI preset selector</b> at the top, choose <b>Ollama</b>, and pick your model.</span></li>
+          <li><span>Exclude apps or windows you don't want recorded, such as your password manager or banking.</span></li>
+          <li><span>Work normally, then open the chat and ask something like <i>"Summarize my 3pm meeting"</i>.</span></li>
+        </ol>
+      </div>
+      <p class="note">Your data is saved in <code>~/.screenpipe/</code> on your computer. Passwords and card numbers are redacted on-device before they're stored.</p>
+      <div class="links">
+        <a href="https://screenpipe.com/" target="_blank" rel="noopener">screenpipe.com ↗</a>
+        <a href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">Download ↗</a>
+        <a href="https://docs.screenpipe.com/ollama" target="_blank" rel="noopener">Ollama setup guide ↗</a>
+        <a href="https://docs.screenpipe.com/faq" target="_blank" rel="noopener">FAQ ↗</a>
+        <a href="https://github.com/screenpipe/screenpipe" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://ollama.com/" target="_blank" rel="noopener">ollama.com ↗</a>
+      </div>
+    </div>
+
+    <div class="panel" id="p-lu" data-t="lu" role="tabpanel" aria-labelledby="tab-lu" hidden>
+      <div>
+        <h3>Before you start</h3>
+        <ul class="req">
+          <li><span class="box"></span><span><b>Computer:</b> Mac or Windows (there's no Linux version)</span></li>
+          <li><span class="box"></span><span><b>Hardware:</b> LUCI doesn't publish minimum specs, so check its site before installing</span></li>
+          <li><span class="box"></span><span><b>Plan:</b> the free tier lets you record sessions of up to 4 hours</span></li>
+          <li><span class="box"></span><span><b>Permissions:</b> screen recording and microphone access</span></li>
+          <li><span class="box"></span><span><b>Optional:</b> <a class="il" href="https://claude.ai/" target="_blank" rel="noopener">Claude</a>, <a class="il" href="https://cursor.com/" target="_blank" rel="noopener">Cursor</a> or <a class="il" href="https://openai.com/codex/" target="_blank" rel="noopener">Codex</a>, if you want an AI agent to read your memory</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>How to use it</h3>
+        <ol class="steps">
+          <li><span>Download LUCI from <a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">luci.memories.ai</a> and install it.</span></li>
+          <li><span>Allow screen recording and microphone access.</span></li>
+          <li><span>Start a capture session. It works in meetings too, with no bot joining the call.</span></li>
+          <li><span>Ask a question in plain language. Answers link back to the moment they came from.</span></li>
+          <li><span>Optional: turn on the <b>Agent Bridge</b> (<a class="il" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP</a>) so Claude can query your sessions.</span></li>
+        </ol>
+      </div>
+      <p class="note">These details come from LUCI's own website, and it lists fewer technical details than the other two. Verify them in a quick trial.</p>
+      <div class="links">
+        <a href="https://luci.memories.ai/" target="_blank" rel="noopener">luci.memories.ai ↗</a>
+        <a href="https://luci.memories.ai/alternatives/screenpipe" target="_blank" rel="noopener">LUCI vs Screenpipe ↗</a>
+      </div>
+    </div>
+
+    <div class="panel" id="p-rc" data-t="rc" role="tabpanel" aria-labelledby="tab-rc" hidden>
+      <div>
+        <h3>Before you start</h3>
+        <ul class="req">
+          <li><span class="box"></span><span><b>PC:</b> a <a class="il" href="https://www.microsoft.com/en-us/windows/copilot-plus-pcs" target="_blank" rel="noopener">Copilot+ PC</a> that meets Secured-core standards</span></li>
+          <li><span class="box"></span><span><b>Chip:</b> an NPU with 40+ TOPS, such as Snapdragon X, AMD Ryzen AI 300 or Intel Core Ultra 200V</span></li>
+          <li><span class="box"></span><span><b>Memory and storage:</b> 16 GB RAM, a 256 GB SSD, and 50 GB free to turn Recall on</span></li>
+          <li><span class="box"></span><span><b>Security:</b> <a class="il" href="https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/" target="_blank" rel="noopener">BitLocker</a> or Device Encryption turned on</span></li>
+          <li><span class="box"></span><span><b>Sign-in:</b> Windows Hello Enhanced Sign-in Security with a face or fingerprint</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>How to use it</h3>
+        <ol class="steps">
+          <li><span>Go to <b>Settings → Privacy &amp; security → Recall &amp; snapshots</b> and turn on <b>Save snapshots</b>.</span></li>
+          <li><span>Open Recall with <span class="kbd">Win</span> + <span class="kbd">J</span> and confirm it's you with Windows Hello.</span></li>
+          <li><span>Type what you remember, for example <i>"blue pricing chart"</i>, to find matching snapshots.</span></li>
+          <li><span>Open a snapshot and use <b>Click to Do</b> to copy text or send an image to another app.</span></li>
+          <li><span>In the same settings page, exclude apps and websites you don't want captured.</span></li>
+        </ol>
+      </div>
+      <p class="note">Recall pauses on its own when free disk space drops below 25 GB. To pause it yourself, click the tray icon and choose <b>Pause until tomorrow</b>.</p>
+      <div class="links">
+        <a href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Microsoft: Using Recall ↗</a>
+        <a href="https://learn.microsoft.com/en-us/windows/client-management/manage-recall" target="_blank" rel="noopener">Manage Recall for IT ↗</a>
+        <a href="https://pureinfotech.com/windows-recall-hardware-requirements/" target="_blank" rel="noopener">Hardware requirements ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUESTIONS -->
+  <section aria-labelledby="ask">
+    <div>
+      <div class="eyebrow">Try it</div>
+      <h2 id="ask">Questions you could ask</h2>
+    </div>
+    <div class="qs">
+      <span>What link did the client share in this morning's call?</span>
+      <span>Summarize everything I worked on yesterday.</span>
+      <span>Which websites did I research for the report on Monday?</span>
+      <span>What did we decide about pricing in the 3pm meeting?</span>
+      <span>Find the error message I saw in the dashboard last week.</span>
+      <span>Draft follow-up notes from today's calls.</span>
+    </div>
+  </section>
+
+  <!-- RULED OUT -->
+  <section aria-labelledby="out">
+    <div>
+      <div class="eyebrow">Also checked</div>
+      <h2 id="out">Ruled out: these upload your video</h2>
+    </div>
+    <div class="out">
+      <div><em>Uploads</em><b><a class="il" href="https://screenapp.io/features/ai-screen-recorder" target="_blank" rel="noopener">ScreenApp</a></b><span>Easy to chat with recordings, but everything goes to its cloud. From $19/mo (annual).</span></div>
+      <div><em>Uploads</em><b><a class="il" href="https://ai.google.dev/gemini-api/docs/video-understanding" target="_blank" rel="noopener">Gemini API</a></b><span>Strong at understanding video, but the file has to be uploaded to Google.</span></div>
+      <div><em>Uploads</em><b><a class="il" href="https://www.loom.com/" target="_blank" rel="noopener">Loom</a></b><span>Cloud only, and its AI gives summaries, not answers. $15/user/mo.</span></div>
+      <div><em>Shut down</em><b><a class="il" href="https://www.hedy.ai/post/meta-acquires-limitless-ai-privacy/" target="_blank" rel="noopener">Rewind / Limitless</a></b><span>Meta bought it, and screen capture stopped on 19 Dec 2025.</span></div>
+    </div>
+  </section>
+
+
+  <!-- FAQ -->
+  <section aria-labelledby="faq">
+    <div>
+      <div class="eyebrow">Q&amp;A</div>
+      <h2 id="faq">Questions to expect, and the answers</h2>
+      <p class="lead" style="margin-top:12px">These are common questions from decision-makers before rolling out a tool like this. Each answer links to its source.</p>
+    </div>
+    <nav class="faq-nav" aria-label="Question topics"><a href="#faq-cost">Cost</a><a href="#faq-privacy">Privacy and security</a><a href="#faq-hardware">Hardware and setup</a><a href="#faq-value">Usefulness and integration</a><a href="#faq-risk">Risk and decision</a></nav>
+    <div class="faq-group" id="faq-cost" style="--gc:var(--sp)">
+      <h3><i></i>Cost</h3>
+      <div class="faq-grid">
+        <div class="qa"><p class="qq">What will it cost?</p><p class="aa"><b>Screenpipe:</b> Free $0 (one device, limited history), Basic $21/mo ($250/yr), Business $42 per seat/mo ($500/seat/yr), Enterprise custom. <b>LUCI:</b> free. <b>Recall:</b> free with Windows 11. <a class="il" href="https://ollama.com/" target="_blank" rel="noopener">Ollama</a> is free.</p><p class="src"><a class="il" href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">Screenpipe pricing ↗</a> · <a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">LUCI ↗</a></p></div>
+        <div class="qa"><p class="qq">Is there any hidden or per-use cost?</p><p class="aa">No cost per question or per video, because the AI model runs on your own computer. The real costs are disk space and, on older laptops, possibly more RAM.</p><p class="src"><a class="il" href="https://docs.screenpipe.com/ollama" target="_blank" rel="noopener">Screenpipe + Ollama docs ↗</a></p></div>
+        <div class="qa"><p class="qq">Which plan do we need for a team?</p><p class="aa">Start the pilot on the Free or Basic plan. Business ($42/seat) adds managed seats, central billing and priority support. Enterprise adds SSO, MDM, retention and device controls.</p><p class="src"><a class="il" href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">Plan comparison ↗</a></p></div>
+      </div>
+    </div>
+    <div class="faq-group" id="faq-privacy" style="--gc:var(--lu)">
+      <h3><i></i>Privacy and security</h3>
+      <div class="faq-grid">
+        <div class="qa"><p class="qq">Does any data leave our computers?</p><p class="aa">No, by default. Screenpipe says data leaves the machine only if you turn on a cloud feature, such as a cloud AI provider or team sync. LUCI says it processes everything on-device with no cloud copy. Recall snapshots stay local.</p><p class="src"><a class="il" href="https://docs.screenpipe.com/faq" target="_blank" rel="noopener">Screenpipe FAQ ↗</a> · <a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">LUCI ↗</a></p></div>
+        <div class="qa"><p class="qq">What about passwords or card numbers shown on screen?</p><p class="aa">All three hide sensitive data automatically. Screenpipe redacts passwords and card numbers on-device before saving, LUCI redacts cards, keys and passwords, and Recall filters them by default. You can also exclude whole apps and websites.</p><p class="src"><a class="il" href="https://docs.screenpipe.com/faq" target="_blank" rel="noopener">Screenpipe FAQ ↗</a> · <a class="il" href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Recall filtering ↗</a></p></div>
+        <div class="qa"><p class="qq">Who can see the recordings?</p><p class="aa">Only the person on that computer. Screenpipe stores data in <code>~/.screenpipe/</code>, LUCI encrypts it at rest, and Recall needs a Windows Hello sign-in to open.</p><p class="src"><a class="il" href="https://docs.screenpipe.com/faq" target="_blank" rel="noopener">Screenpipe storage ↗</a> · <a class="il" href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Recall security ↗</a></p></div>
+        <div class="qa"><p class="qq">Is it legal to record people? Do we need consent?</p><p class="aa">You need a written policy and consent from anyone being recorded. The rules depend on your country and company, so check with HR or legal before rolling it out. <span class="flag">Not legal advice</span></p></div>
+        <div class="qa"><p class="qq">Is LUCI certified?</p><p class="aa">LUCI says it is SOC 2 Type 2 certified and GDPR compliant. Ask them for the report before signing up.</p><p class="src"><a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">LUCI ↗</a></p></div>
+      </div>
+    </div>
+    <div class="faq-group" id="faq-hardware" style="--gc:var(--rc)">
+      <h3><i></i>Hardware and setup</h3>
+      <div class="faq-grid">
+        <div class="qa"><p class="qq">Will it slow down our laptops?</p><p class="aa">Screenpipe recommends a quad-core CPU, 4 GB+ RAM and an SSD. The local AI model needs about 2 GB of RAM plus 2 GB overhead. Recall needs a Copilot+ PC with 16 GB RAM. The pilot will show the real impact.</p><p class="src"><a class="il" href="https://docs.screenpipe.com/faq" target="_blank" rel="noopener">Screenpipe requirements ↗</a> · <a class="il" href="https://docs.screenpipe.com/ollama" target="_blank" rel="noopener">Ollama RAM ↗</a></p></div>
+        <div class="qa"><p class="qq">How much disk space does it use?</p><p class="aa">Screenpipe uses about 30 GB a month at the default 1 frame per second. Recall needs 50 GB free to turn on and pauses when free space drops below 25 GB. Plan when to delete old data.</p><p class="src"><a class="il" href="https://docs.screenpipe.com/faq" target="_blank" rel="noopener">Screenpipe FAQ ↗</a> · <a class="il" href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Recall storage ↗</a></p></div>
+        <div class="qa"><p class="qq">Does it work on Mac and Windows?</p><p class="aa">Screenpipe runs on Mac, Windows 10/11 and Linux. LUCI runs on Mac and Windows. Recall runs only on Windows 11 Copilot+ PCs.</p><p class="src"><a class="il" href="https://screenpipe.com/" target="_blank" rel="noopener">Screenpipe ↗</a> · <a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">LUCI ↗</a> · <a class="il" href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Recall ↗</a></p></div>
+        <div class="qa"><p class="qq">How long does setup take?</p><p class="aa">Roughly 15–30 minutes per computer: install the app, grant permissions, install Ollama and download a model. <span class="flag">Estimate</span></p><p class="src"><a class="il" href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">Download ↗</a> · <a class="il" href="https://docs.screenpipe.com/ollama" target="_blank" rel="noopener">Ollama guide ↗</a></p></div>
+        <div class="qa"><p class="qq">Can IT deploy it centrally?</p><p class="aa">Screenpipe Enterprise supports MDM, SSO and audit logs. For Recall, IT admins can control it through Windows policies.</p><p class="src"><a class="il" href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">Screenpipe Enterprise ↗</a> · <a class="il" href="https://learn.microsoft.com/en-us/windows/client-management/manage-recall" target="_blank" rel="noopener">Manage Recall (IT) ↗</a></p></div>
+      </div>
+    </div>
+    <div class="faq-group" id="faq-value" style="--gc:var(--sun)">
+      <h3><i></i>Usefulness and integration</h3>
+      <div class="faq-grid">
+        <div class="qa"><p class="qq">What can we actually ask it?</p><p class="aa">Things like "what link was shared in the 10am call", "summarize my day" or "find the error I saw last week". Screenpipe and LUCI answer in plain language. Recall only searches.</p><p class="src"><a class="il" href="https://screenpipe.com/" target="_blank" rel="noopener">Screenpipe ↗</a> · <a class="il" href="https://luci.memories.ai/" target="_blank" rel="noopener">LUCI ↗</a></p></div>
+        <div class="qa"><p class="qq">How accurate are the answers?</p><p class="aa">Nobody publishes accuracy figures. Accuracy depends on the AI model you pick: small local models are faster, larger ones are better. The pilot should score 5–10 real questions.</p><p class="src"><a class="il" href="https://docs.screenpipe.com/ollama" target="_blank" rel="noopener">Model choices ↗</a></p></div>
+        <div class="qa"><p class="qq">Can it connect to our other tools?</p><p class="aa">Screenpipe has a REST API and an MCP server, so AI agents like Claude can query it. It can also sync notes to Notion or Obsidian. LUCI connects to Claude, Cursor, Codex and others through MCP. Recall has no API.</p><p class="src"><a class="il" href="https://github.com/screenpipe/screenpipe" target="_blank" rel="noopener">Screenpipe GitHub ↗</a> · <a class="il" href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">What is MCP ↗</a></p></div>
+        <div class="qa"><p class="qq">Why not use Loom, ScreenApp or Gemini?</p><p class="aa">They all upload the video to the cloud. Loom's AI also stops at summaries and chapters.</p><p class="src"><a class="il" href="https://screenapp.io/features/ai-screen-recorder" target="_blank" rel="noopener">ScreenApp ↗</a> · <a class="il" href="https://ai.google.dev/gemini-api/docs/video-understanding" target="_blank" rel="noopener">Gemini API ↗</a> · <a class="il" href="https://www.loom.com/" target="_blank" rel="noopener">Loom ↗</a></p></div>
+      </div>
+    </div>
+    <div class="faq-group" id="faq-risk" style="--gc:var(--rec)">
+      <h3><i></i>Risk and decision</h3>
+      <div class="faq-grid">
+        <div class="qa"><p class="qq">What if the vendor shuts down, like Rewind did?</p><p class="aa">Rewind stopped screen capture in December 2025 after Meta bought it. Screenpipe's code is public and its data sits in normal local files, so the lock-in risk is lower. LUCI is closed source.</p><p class="src"><a class="il" href="https://www.hedy.ai/post/meta-acquires-limitless-ai-privacy/" target="_blank" rel="noopener">Rewind shutdown ↗</a> · <a class="il" href="https://github.com/screenpipe/screenpipe" target="_blank" rel="noopener">Screenpipe source ↗</a></p></div>
+        <div class="qa"><p class="qq">What are the main risks?</p><p class="aa">Staff privacy concerns, disk usage, and answers that may be wrong or incomplete. Reduce them with a consent policy, app exclusions, a data-retention rule and a small pilot first.</p></div>
+        <div class="qa"><p class="qq">What do you need from me?</p><p class="aa">Approval for a 2-week pilot on one computer, using the free plan. After that, you get accuracy results, performance notes and a go / no-go recommendation.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERDICT -->
+  <section aria-labelledby="rec">
+    <div class="verdict">
+      <div>
+        <div class="eyebrow" style="color:#8B91A6">Recommendation</div>
+        <h2 id="rec">Pilot <span>Screenpipe + Ollama</span></h2>
+        <p>It's the only option that records all day, answers questions in plain English, runs on all our machines, and keeps everything offline. It's free to start ($21/mo for full history), and Claude can connect to it later for automation.</p>
+        <p>LUCI is the backup if Screenpipe's answers aren't good enough. Recall only makes sense if we already own Copilot+ PCs.</p>
+      </div>
+      <ol class="plan">
+        <li><span class="d">Week 1</span><span>Install Screenpipe and Ollama on one test computer and record a normal workday.</span></li>
+        <li><span class="d">Week 1</span><span>Ask 5–10 real questions and score how accurate the answers are.</span></li>
+        <li><span class="d">Week 2</span><span>Agree on privacy rules: which apps to exclude and who is recorded.</span></li>
+        <li><span class="d">Week 2</span><span>Decide whether to roll it out to the team, or test LUCI next.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- SOURCES -->
+  <section aria-labelledby="src">
+    <div class="eyebrow" id="src">Sources</div>
+    <div class="sources">
+      <a href="https://screenpipe.com/" target="_blank" rel="noopener">Screenpipe: product site</a>
+      <a href="https://docs.screenpipe.com/faq" target="_blank" rel="noopener">Screenpipe docs: FAQ and requirements</a>
+      <a href="https://docs.screenpipe.com/ollama" target="_blank" rel="noopener">Screenpipe docs: Ollama</a>
+      <a href="https://screenpipe.com/blog/best-ai-screen-recorder-2026" target="_blank" rel="noopener">Screenpipe: best AI screen recorder 2026 (pricing)</a>
+      <a href="https://luci.memories.ai/alternatives/screenpipe" target="_blank" rel="noopener">LUCI: Screenpipe alternatives compared</a>
+      <a href="https://support.microsoft.com/en-us/windows/retrace-your-steps-with-recall-aa03f8a0-a78b-4b3e-b0a1-2eb8ac48701c" target="_blank" rel="noopener">Microsoft Support: Retrace your steps with Recall</a>
+      <a href="https://pureinfotech.com/windows-recall-hardware-requirements/" target="_blank" rel="noopener">Pureinfotech: Recall hardware requirements</a>
+      <a href="https://screenapp.io/features/ai-screen-recorder" target="_blank" rel="noopener">ScreenApp: AI screen recorder</a>
+      <a href="https://ai.google.dev/gemini-api/docs/video-understanding" target="_blank" rel="noopener">Gemini API: video understanding</a>
+      <a href="https://www.screenify.studio/blog/2026-04-29-loom-pricing-after-atlassian" target="_blank" rel="noopener">Screenify: Loom pricing 2026</a>
+      <a href="https://www.hedy.ai/post/meta-acquires-limitless-ai-privacy/" target="_blank" rel="noopener">Hedy AI: Meta acquires Limitless</a>
+      <a href="https://screenpipe.com/onboarding" target="_blank" rel="noopener">Screenpipe: pricing plans</a>
+      <a href="https://luci.memories.ai/" target="_blank" rel="noopener">LUCI: product site</a>
+      <a href="https://learn.microsoft.com/en-us/windows/client-management/manage-recall" target="_blank" rel="noopener">Microsoft Learn: Manage Recall</a>
+      <a href="https://ollama.com/" target="_blank" rel="noopener">Ollama</a>
+      <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol (MCP)</a>
+    </div>
+  </section>
+
+  <footer>Researched 30 Sep 2026. Prices and features change, so check each vendor's site before buying.</footer>
+</div>
+
+<script>
+(function(){
+  var tabs = document.querySelectorAll('.tab');
+  function show(t){
+    tabs.forEach(function(b){
+      var on = b.dataset.t === t;
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+      document.getElementById('p-' + b.dataset.t).hidden = !on;
+    });
+  }
+  tabs.forEach(function(b){ b.addEventListener('click', function(){ show(b.dataset.t); }); });
+  var h = location.hash.replace('#','');
+  if (['sp','lu','rc'].indexOf(h) > -1) show(h);
+
+  document.querySelectorAll('.copy').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var text = btn.dataset.copy;
+      function done(){ btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500); }
+      function fallback(){
+        var code = btn.parentNode.querySelector('code');
+        var r = document.createRange(); r.selectNodeContents(code);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+        btn.textContent = 'Press Ctrl+C';
+      }
+      try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    });
+  });
+})();
+</script>
+
+</body></html>
